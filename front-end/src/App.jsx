@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import "./App.css";
 import Navbar from "./components/navbar/navbar";
 import PlantDetail from "./components/plantDetail/PlantDetail";
 import PlantSearcher from "./components/plantSearcher/plantSearcher";
@@ -9,22 +8,72 @@ import Home from "./components/home/home";
 import Login from "./components/login/login";
 import SignUp from "./components/signUp/signUp";
 import PlantDetailDb from "./components/plantDetailDb/plantDetailDb";
+import requestService from "./services/httpservice";
+import TokenService from "./services/tokenService";
+import "./App.css";
 
 function App() {
-	const [count, setCount] = useState(0);
+	const [user, setUser] = useState({
+		email: "",
+		username: "",
+	});
+
+	useEffect(() => {
+		requestService
+			.get("auth/users/me/")
+			.then(({ data }) =>
+				setUser((prev) => ({
+					...prev,
+					...data,
+				}))
+			)
+			.catch((err) => {
+				let newData = { email: "", username: "" };
+				setUser((prev) => ({
+					...newData,
+				}));
+			});
+	}, []);
+
+	const handleLogout = () => {
+		TokenService.clearToken();
+		setUser((prev) => ({
+			email: "",
+			username: "",
+		}));
+		window.location.href = "/login";
+		console.log("clicked");
+	};
 
 	return (
 		<div className="App">
-			<Navbar />
+			<Navbar onLogout={handleLogout} username={user.username} />
+
 			<Routes>
-				<Route path="/plant-list" element={<PlantTrackerList />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<SignUp />} />
-				<Route path="/plant-search" element={<PlantSearcher />} />
-				<Route path="/" element={<Home />} />
-				<Route path="/plant-detail/:id" element={<PlantDetail />} />
-				<Route path="/plant-detail-db/:id" element={<PlantDetailDb />} />
 				<Route path="*" element={<h1>404 not found</h1>} />
+				<Route path="/" element={<Home />} />
+				<Route
+					path="/plant-list"
+					username={user.username}
+					element={<PlantTrackerList />}
+				/>
+				<Route
+					path="/plant-search"
+					username={user.username}
+					element={<PlantSearcher />}
+				/>
+				<Route
+					path="/plant-detail/:id"
+					username={user.username}
+					element={<PlantDetail />}
+				/>
+				<Route
+					path="/plant-detail-db/:id"
+					username={user.username}
+					element={<PlantDetailDb />}
+				/>
 			</Routes>
 		</div>
 	);

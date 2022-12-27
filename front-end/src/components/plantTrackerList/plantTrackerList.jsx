@@ -2,16 +2,31 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import requestService from "../../services/httpservice";
 import "../plantSearcher/plantSearcher.css";
+import TokenService from "../../services/tokenService";
 
-function PlantTrackerList() {
+function PlantTrackerList({ username }) {
 	const [plantsList, setPlantsList] = useState([]);
 
 	useEffect(() => {
+		if (!TokenService.getAccessTokenValidity()) {
+			console.log(username);
+			return (window.location.href = "/login");
+		}
 		requestService.get("plants").then(({ data }) => {
 			setPlantsList(data);
 			console.log(data);
 		});
 	}, []);
+
+	const handleDelete = (id) => {
+		// console.log("delete", id);
+		let plants = plantsList;
+		requestService
+			.delete(`plants/${id}/`)
+			.then((res) => setPlantsList(plantsList.filter((p) => p.id !== id)))
+			.catch((err) => setPlantsList(plants));
+	};
+
 	return (
 		<div className="list container mt-3">
 			<div className="content">
@@ -34,13 +49,23 @@ function PlantTrackerList() {
 									</p>
 
 									<p>date to plant: {plant.date_to_plant}</p>
-									<div className="card-read-more">
-										<Link
-											to={"/plant-detail-db/" + plant.id}
-											className="btn btn-link btn-block"
-										>
-											Plant-detail
-										</Link>
+									<div className="d-flex justify-content-between align-items-center">
+										<div className="card-read-more">
+											<Link
+												to={"/plant-detail-db/" + plant.id}
+												className="btn btn-link btn-block"
+											>
+												Plant-detail
+											</Link>
+										</div>
+										<div className="delete">
+											<button
+												onClick={() => handleDelete(plant.id)}
+												className="btn btn-danger btn-sm"
+											>
+												Delete
+											</button>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -48,9 +73,9 @@ function PlantTrackerList() {
 					))}
 				</div>
 				<div className="add-more text-center">
-					<button className="btn btn-success mt-4">
-						Add more to your plant list
-					</button>
+					<Link to="/plant-search" className="btn btn-success mt-4">
+						Add or find plants to add to your plant list
+					</Link>
 				</div>
 			</div>
 		</div>

@@ -10,12 +10,23 @@ requestService.interceptors.request.use(
 		const token = TokenService.getAccessToken();
 		if (token) {
 			config.headers.Authorization = `JWT ${token}`;
-        }
-		
+		}
+
 		return config;
 	},
 	(error) => {
 		Promise.reject(error);
+	}
+);
+requestService.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		const valid = TokenService.getRefreshTokenValidity();
+
+		if (!valid) {
+			TokenService.clearToken();
+		}
+		return Promise.reject(error);
 	}
 );
 

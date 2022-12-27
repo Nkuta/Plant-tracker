@@ -1,14 +1,14 @@
-.image{
-    overflow: hidden;
-    height: auto;
+.image {
+	overflow: hidden;
+	height: auto;
 }
-.plant-image{
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
+.plant-image {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
 }
-@media screen and (min-width:992px){
-    .image{
-        height:600px
-    }
+@media screen and (min-width: 992px) {
+	.image {
+		height: 600px;
+	}
 }

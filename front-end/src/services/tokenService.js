@@ -1,4 +1,4 @@
-// import jwt from 'jsonwebtoken'
+import jwtDecode from "jwt-decode";
 
 const TokenService = (function tokenService() {
 	let service;
@@ -23,13 +23,13 @@ const TokenService = (function tokenService() {
 	const getRefreshToken = () => localStorage.getItem("refreshToken");
 
 	const getTokenValidity = (tokenObj) => {
-		// const decodedToken = jwt.decode(tokenObj, { complete: true });
-		// const dateNow = new Date();
-		// const timestamp = dateNow.getMinutes() / 1000;
+		const decodedToken = jwtDecode(tokenObj);
+		const dateNow = new Date();
+		const timestamp = dateNow.getMinutes() / 1000;
 
-		// if (decodedToken.payload.exp < timestamp) {
-		// 	return false;
-		// }
+		if (decodedToken.exp < timestamp) {
+			return false;
+		}
 		return true;
 	};
 

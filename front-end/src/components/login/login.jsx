@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link,Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import "./login.css";
 import requestService from "../../services/httpservice";
 import TokenService from "../../services/tokenService";
@@ -10,10 +10,7 @@ function Login() {
 	const [error, setError] = useState(false);
 	const url = "auth/jwt/create";
 
-
-	useEffect(() => {
-		TokenService.clearToken()
-	},[])
+	
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -23,12 +20,11 @@ function Login() {
 		};
 		requestService
 			.post(url, data)
-			.then(({data}) => {
+			.then(({ data }) => {
 				console.log(data);
-				TokenService.setToken(data)
+				TokenService.setToken(data);
 				error && setError(!error);
-				window.location.href ='/'
-				
+				window.location.href = "/plant-list";
 			})
 			.catch((err) => setError(!error));
 	};

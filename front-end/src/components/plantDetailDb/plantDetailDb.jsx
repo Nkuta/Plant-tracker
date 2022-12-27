@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import requestService from "../../services/httpservice";
 import "../plantDetail/plantDetail.css";
+import TokenService from "../../services/tokenService";
 
 function PlantDetailDb() {
 	const [detail, setDetail] = useState({
@@ -16,6 +17,9 @@ function PlantDetailDb() {
 	let { id } = useParams();
 
 	useEffect(() => {
+		if (!TokenService.getAccessTokenValidity()) {
+			return (window.location.href = "/login");
+		}
 		requestService.get(`plants/${id}`).then(({ data }) => {
 			console.log(data);
 			setDetail((detail) => ({
@@ -26,7 +30,7 @@ function PlantDetailDb() {
 	}, []);
 
 	return (
-		<div div className="container">
+		<div div className="container mb-4">
 			<h2 className="text-center mt-2 mb-3">
 				{detail.common_name} ({detail.scientific_name})
 			</h2>
@@ -47,7 +51,10 @@ function PlantDetailDb() {
 
 			<div className="summary mt-3">
 				<h3>Summary</h3>
-				<p>{detail.summary}</p>
+				<p
+					className="fs-4"
+					dangerouslySetInnerHTML={{ __html: detail.summary }}
+				></p>
 			</div>
 		</div>
 	);
